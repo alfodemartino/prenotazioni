@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# variabili d'ambiente (contengono il segreto di sessione)
+.env
+.env.local
+.env*.local
+
+# database locale di sviluppo
+prisma/*.db
+prisma/*.db-journal
+
+.DS_Store
+*.log

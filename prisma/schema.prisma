@@ -1,0 +1,155 @@
+// Schema del database — Prenotazioni Piscina
+//
+// In sviluppo si usa SQLite: nessuna installazione, il database è un file.
+// Per passare a PostgreSQL in produzione basta cambiare `provider` qui sotto in
+// "postgresql" e aggiornare DATABASE_URL. Lo schema è scritto per essere
+// compatibile con entrambi: niente enum (non supportati da SQLite), le date-giornata
+// sono stringhe "YYYY-MM-DD" e gli importi sono interi in centesimi.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Tesserato del circolo. Gli account sono creati esclusivamente dall'amministrazione.
+model Socio {
+  id            String @id @default(cuid())
+  numeroTessera String @unique
+  nome          String
+  cognome       String
+  email         String @unique
+  passwordHash  String
+
+  /// "SOCIO" | "ADMIN"
+  ruolo String @default("SOCIO")
+  /// "ATTIVO" | "SOSPESO"
+  stato String @default("ATTIVO")
+
+  /// Scadenze in formato "YYYY-MM-DD". NULL = nessuna scadenza da controllare.
+  scadenzaTessera     String?
+  scadenzaCertificato String?
+
+  telefono String?
+  note     String?
+
+  /// Forza il cambio password al primo accesso (credenziali consegnate dalla segreteria).
+  deveCambiarePassword Boolean @default(true)
+
+  /// Aumenta a ogni cambio password. I cookie di sessione portano con sé questo
+  /// numero: cambiando la password, le sessioni aperte altrove smettono di valere.
+  versioneSessione Int @default(0)
+
+  creatoIl     DateTime @default(now())
+  aggiornatoIl DateTime @updatedAt
+
+  prenotazioni Prenotazione[]
+
+  @@index([cognome, nome])
+}
+
+/// Configurazione di una singola giornata. Viene creata al primo utilizzo copiando
+/// i valori di default dalle Impostazioni, così l'admin può poi personalizzarla
+/// (capienza ridotta, chiusura per manutenzione, orario speciale) senza toccare le altre.
+model Giornata {
+  /// "YYYY-MM-DD" — chiave naturale, nessuna ambiguità di fuso orario.
+  data String @id
+
+  aperta         Boolean @default(true)
+  capienzaAdulti Int
+  overbookingPct Int
+  oraApertura    String
+  oraChiusura    String
+  nota           String?
+
+  creataIl     DateTime @default(now())
+  aggiornataIl DateTime @updatedAt
+
+  prenotazioni Prenotazione[]
+}
+
+/// Accesso prenotato da un socio per una giornata, per sé e il proprio gruppo.
+model Prenotazione {
+  id      String @id @default(cuid())
+  socioId String
+  data    String
+
+  /// Composizione del gruppo dichiarata in fase di prenotazione.
+  /// Solo `adulti` (tesserati adulti) consuma capienza.
+  adulti        Int
+  bambini       Int @default(0)
+  ospitiAdulti  Int @default(0)
+  ospitiBambini Int @default(0)
+
+  /// "ATTIVA" | "ANNULLATA". La presenza non è uno stato: si deduce da checkInIl.
+  stato String @default("ATTIVA")
+
+  /// Chiave tecnica per il vincolo "una sola prenotazione viva per socio per giornata".
+  /// Vale `data` quando la prenotazione è ATTIVA, NULL quando è annullata.
+  /// In SQL due NULL non collidono mai, quindi le prenotazioni annullate non
+  /// impediscono al socio di prenotare di nuovo la stessa giornata.
+  slotAttivo String?
+
+  /// Check-in alla reception. Se a giornata conclusa è NULL, si tratta di un no-show.
+  checkInIl        DateTime?
+  adultiEffettivi  Int?
+  bambiniEffettivi Int?
+  ospitiEffettivi  Int?
+
+  creataIl     DateTime  @default(now())
+  aggiornataIl DateTime  @updatedAt
+  annullataIl  DateTime?
+
+  socio    Socio    @relation(fields: [socioId], references: [id], onDelete: Cascade)
+  giornata Giornata @relation(fields: [data], references: [data], onDelete: Cascade)
+
+  @@unique([socioId, slotAttivo])
+  @@index([data, stato])
+}
+
+/// Tentativi di accesso FALLITI, usati per frenare chi prova password a raffica.
+/// Le righe vengono cancellate quando l'accesso riesce e comunque dopo un giorno.
+model TentativoAccesso {
+  id     String   @id @default(cuid())
+  email  String
+  ip     String
+  quando DateTime @default(now())
+
+  @@index([email, quando])
+  @@index([ip, quando])
+}
+
+/// Riga unica (id = 1) con tutti i parametri configurabili dal pannello admin.
+/// I valori qui sotto sono segnaposto: vanno rivisti nella sezione Configurazioni.
+model Impostazioni {
+  id Int @id @default(1)
+
+  nomeCircolo String @default("Circolo Piscina")
+
+  /// Capienza applicata alle giornate nuove. Conta solo gli adulti tesserati.
+  capienzaAdultiDefault Int @default(80)
+  /// Tolleranza di overbooking in percentuale sulla capienza.
+  overbookingPct        Int @default(10)
+  /// Quanti giorni oltre oggi sono prenotabili (2 = oggi, domani, dopodomani).
+  giorniFinestra        Int @default(2)
+
+  oraAperturaDefault String @default("09:00")
+  oraChiusuraDefault String @default("19:00")
+
+  /// Tariffe ospiti in centesimi di euro (indicative, si pagano in contanti in cassa).
+  tariffaOspiteAdultoCent  Int @default(1000)
+  tariffaOspiteBambinoCent Int @default(500)
+
+  /// Sotto questa soglia di posti residui la giornata è mostrata come "Ultimi posti".
+  sogliaUltimiPosti Int @default(5)
+  /// Tetto di persone per singola prenotazione, contro gli errori di digitazione.
+  maxPersonePerPrenotazione Int @default(20)
+
+  /// Se attivo, un certificato medico scaduto blocca le nuove prenotazioni.
+  controlloCertificato Boolean @default(false)
+
+  aggiornatoIl DateTime @updatedAt
+}
