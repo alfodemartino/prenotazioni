@@ -12,5 +12,10 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalPerPrisma.prisma = prisma;
 
-/** True quando il database sottostante è PostgreSQL (in sviluppo si usa SQLite). */
+/**
+ * True quando il database sottostante è PostgreSQL — oggi sempre, in sviluppo
+ * come in produzione. Il controllo resta come rete di sicurezza: se qualcuno
+ * ripuntasse l'app su un altro motore, il lock di riga in `prenotazioni.ts`
+ * ripiegherebbe sulla variante portabile invece di emettere SQL non valido.
+ */
 export const usaPostgres = (process.env.DATABASE_URL ?? "").startsWith("postgres");

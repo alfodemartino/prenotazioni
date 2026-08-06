@@ -10,7 +10,7 @@ next-env.d.ts
 .env.local
 .env*.local
 
-# database locale di sviluppo
+# eventuali residui del vecchio database SQLite di sviluppo
 prisma/*.db
 prisma/*.db-journal
 
