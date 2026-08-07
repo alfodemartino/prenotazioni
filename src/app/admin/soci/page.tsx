@@ -11,7 +11,7 @@ export default async function PaginaSoci({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
-  const { soci, totale, oggi } = await elencoSoci(q);
+  const { soci, totale, oggi } = await elencoSoci();
 
   return (
     <>
@@ -33,7 +33,7 @@ export default async function PaginaSoci({
       </div>
 
       <div className="mb-5">
-        <SearchableSociList soci={soci} totale={totale} oggi={oggi} queryIniziale={q} />
+        <SearchableSociList soci={soci} oggi={oggi} queryIniziale={q} />
       </div>
     </>
   );
