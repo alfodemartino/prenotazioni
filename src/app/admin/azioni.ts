@@ -27,7 +27,13 @@ import {
   validaIntervallo,
   validaSocio,
 } from "@/lib/validazioni";
-import { lunghezzaMinimaPerRuolo, validaPassword } from "@/lib/password";
+import { generaPasswordLeggibile, lunghezzaMinimaPerRuolo, validaPassword } from "@/lib/password";
+import { analizzaCsv } from "@/lib/csv";
+import {
+  interpretaCsvSoci,
+  type ProblemaRiga,
+  type RigaSocio,
+} from "@/lib/importaSoci";
 
 /** Le pagine da rinfrescare dopo una modifica che tocca la disponibilità. */
 function rinfrescaTutto() {
@@ -410,4 +416,141 @@ function messaggioDuplicato(e: unknown): string | null {
   if (testoCampi.includes("numeroTessera")) return "Questo numero di tessera è già in uso.";
 
   return "Esiste già un socio con questi dati.";
+}
+
+// ---------------------------------------------------------------------------
+// Import massivo di soci
+// ---------------------------------------------------------------------------
+
+export type StatoImport = {
+  errore?: string;
+  /** Righe pronte da creare, mostrate in anteprima prima della conferma. */
+  daImportare?: RigaSocio[];
+  /** Righe scartate, con il motivo. */
+  problemi?: ProblemaRiga[];
+  /** Valorizzato solo dopo la conferma: le credenziali da consegnare ai soci. */
+  credenziali?: Credenziale[];
+} | null;
+
+export interface Credenziale {
+  numeroTessera: string;
+  nome: string;
+  cognome: string;
+  email: string;
+  password: string;
+}
+
+/**
+ * Analizza il file e, solo se `conferma` vale "1", crea davvero i soci.
+ *
+ * Le due fasi condividono questa azione perché devono condividere anche il
+ * modo di leggere il file: se l'anteprima e l'inserimento interpretassero il
+ * CSV con due funzioni diverse, l'utente potrebbe confermare una cosa e
+ * ottenerne un'altra. Il file viene rispedito dal browser alla conferma e
+ * rianalizzato da capo, così il controllo sui doppioni è sempre aggiornato.
+ */
+export async function importaSoci(_prec: StatoImport, fd: FormData): Promise<StatoImport> {
+  await richiediAdmin();
+
+  const file = fd.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { errore: "Scegli un file CSV da caricare." };
+  }
+
+  const analisi = interpretaCsvSoci(analizzaCsv(await file.text()));
+  if (analisi.erroreFatale) return { errore: analisi.erroreFatale };
+
+  const problemi = [...analisi.problemi];
+
+  // Doppioni rispetto a chi è già registrato. Una sola interrogazione per
+  // entrambi i campi: con qualche centinaio di righe, un SELECT per socio
+  // significherebbe centinaia di viaggi verso il database.
+  const gia = await prisma.socio.findMany({
+    where: {
+      OR: [
+        { email: { in: analisi.righe.map((r) => r.email) } },
+        { numeroTessera: { in: analisi.righe.map((r) => r.numeroTessera) } },
+      ],
+    },
+    select: { email: true, numeroTessera: true },
+  });
+
+  const emailEsistenti = new Set(gia.map((s) => s.email));
+  const tessereEsistenti = new Set(gia.map((s) => s.numeroTessera));
+
+  const daImportare = analisi.righe.filter((r) => {
+    if (emailEsistenti.has(r.email)) {
+      problemi.push({
+        riga: r.riga,
+        riferimento: `${r.numeroTessera} — ${r.nome} ${r.cognome}`,
+        descrizione: "Esiste già un socio con questa email: la riga viene saltata.",
+      });
+      return false;
+    }
+    if (tessereEsistenti.has(r.numeroTessera)) {
+      problemi.push({
+        riga: r.riga,
+        riferimento: `${r.numeroTessera} — ${r.nome} ${r.cognome}`,
+        descrizione: "Questo numero di tessera è già in uso: la riga viene saltata.",
+      });
+      return false;
+    }
+    return true;
+  });
+
+  problemi.sort((a, b) => a.riga - b.riga);
+
+  if (testo(fd, "conferma") !== "1") {
+    return { daImportare, problemi };
+  }
+
+  if (daImportare.length === 0) {
+    return { errore: "Non c'è nessuna riga valida da importare.", daImportare, problemi };
+  }
+
+  // Le password si generano prima dell'inserimento: servono in chiaro per
+  // consegnarle ai soci, e l'hash è l'unica cosa che finisce a database.
+  const credenziali: Credenziale[] = daImportare.map((r) => ({
+    numeroTessera: r.numeroTessera,
+    nome: r.nome,
+    cognome: r.cognome,
+    email: r.email,
+    password: generaPasswordLeggibile({ contesto: r }),
+  }));
+
+  const hash = await Promise.all(credenziali.map((c) => bcrypt.hash(c.password, 10)));
+
+  try {
+    // createMany è una sola INSERT: o entrano tutti o non entra nessuno. Con i
+    // doppioni già filtrati sopra, un errore qui significa che qualcuno ha
+    // creato lo stesso socio nel frattempo — meglio annullare che lasciare
+    // l'elenco importato a metà senza sapere dove si è fermato.
+    await prisma.socio.createMany({
+      data: daImportare.map((r, i) => ({
+        numeroTessera: r.numeroTessera,
+        nome: r.nome,
+        cognome: r.cognome,
+        email: r.email,
+        telefono: r.telefono,
+        note: r.note,
+        scadenzaTessera: r.scadenzaTessera,
+        scadenzaCertificato: r.scadenzaCertificato,
+        ruolo: "SOCIO",
+        stato: "ATTIVO",
+        passwordHash: hash[i],
+        deveCambiarePassword: true,
+      })),
+    });
+  } catch (e) {
+    return {
+      errore:
+        messaggioDuplicato(e) ??
+        "Non è stato possibile completare l'import: nessun socio è stato creato.",
+      daImportare,
+      problemi,
+    };
+  }
+
+  revalidatePath("/admin/soci");
+  return { credenziali, problemi };
 }
