@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { INPUT, RIQUADRO } from "./stili";
@@ -27,40 +27,59 @@ function Etichetta({ testo, tono }: { testo: string; tono: "rosso" | "grigio" })
   );
 }
 
+/**
+ * Elenco dei soci con ricerca dal vivo.
+ *
+ * `soci` è sempre l'elenco completo: il filtro sta qui, così ogni tasto ha
+ * effetto immediato e nessuna risposta del server può arrivare in ritardo con
+ * un elenco già ristretto.
+ *
+ * L'URL segue la ricerca con un po' di calma (300 ms) solo per renderla
+ * condivisibile e ricaricabile; non serve a produrre i risultati.
+ */
 export default function SearchableSociList({
   soci,
-  totale,
   oggi,
   queryIniziale,
 }: {
   soci: Socio[];
-  totale: number;
   oggi: string;
   queryIniziale: string | undefined;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(queryIniziale ?? "");
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Al primo render l'URL rispecchia già `queryIniziale`: riscriverlo
+  // significherebbe solo una navigazione in più a ogni visita della pagina.
+  const primoRender = useRef(true);
 
   useEffect(() => {
-    if (timeoutId) clearTimeout(timeoutId);
+    if (primoRender.current) {
+      primoRender.current = false;
+      return;
+    }
 
     const id = setTimeout(() => {
-      const params = q.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
-      router.push(`/admin/soci${params}`);
+      const ricerca = q.trim();
+      // `replace` e non `push`: ogni pausa nella digitazione lascerebbe una voce
+      // di cronologia, e il tasto Indietro ripercorrerebbe le ricerche invece di
+      // riportare il socio alla pagina precedente.
+      router.replace(ricerca ? `/admin/soci?q=${encodeURIComponent(ricerca)}` : "/admin/soci", {
+        scroll: false,
+      });
     }, 300);
-
-    setTimeoutId(id);
 
     return () => clearTimeout(id);
   }, [q, router]);
 
-  const filtrati = q
+  const ricerca = q.trim().toLowerCase();
+
+  const filtrati = ricerca
     ? soci.filter((s) =>
         [s.nome, s.cognome, s.email, s.numeroTessera]
           .join(" ")
           .toLowerCase()
-          .includes(q.toLowerCase()),
+          .includes(ricerca),
       )
     : soci;
 
@@ -77,11 +96,7 @@ export default function SearchableSociList({
 
       {filtrati.length === 0 ? (
         <p className={`${RIQUADRO} text-sm text-slate-500`}>
-          {q
-            ? `Nessun socio trovato per «${q}».`
-            : totale === 0
-              ? "Non c'è ancora nessun socio."
-              : ""}
+          {ricerca ? `Nessun socio trovato per «${q.trim()}».` : "Non c'è ancora nessun socio."}
         </p>
       ) : (
         <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">

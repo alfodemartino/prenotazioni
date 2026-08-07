@@ -121,29 +121,37 @@ export async function calendario(da: DataISO, giorni: number) {
 // Soci
 // ---------------------------------------------------------------------------
 
-export async function elencoSoci(ricerca?: string) {
-  const q = ricerca?.trim();
-
-  // SQLite non supporta `mode: "insensitive"` in Prisma: si confronta in minuscolo
-  // a mano, così la ricerca funziona uguale sui due motori.
+/**
+ * Elenco completo dei soci per il pannello admin.
+ *
+ * Non filtra: la ricerca è tutta nel componente client, che così può reagire a
+ * ogni tasto senza tornare al server. Filtrare anche qui darebbe risposte
+ * sbagliate — il client si ritroverebbe a cercare dentro un elenco già ristretto
+ * dalla ricerca precedente, e un socio esistente risulterebbe assente finché non
+ * arriva la risposta successiva.
+ *
+ * I campi vengono scelti uno per uno: l'elenco attraversa il confine
+ * server/client, e un `findMany` senza `select` ci spedirebbe anche
+ * `passwordHash`.
+ */
+export async function elencoSoci() {
   const soci = await prisma.socio.findMany({
     orderBy: [{ cognome: "asc" }, { nome: "asc" }],
+    select: {
+      id: true,
+      nome: true,
+      cognome: true,
+      email: true,
+      numeroTessera: true,
+      ruolo: true,
+      stato: true,
+      scadenzaTessera: true,
+    },
   });
 
-  const filtrati = q
-    ? soci.filter((s) =>
-        [s.nome, s.cognome, s.email, s.numeroTessera]
-          .join(" ")
-          .toLowerCase()
-          .includes(q.toLowerCase()),
-      )
-    : soci;
-
-  const oggi = oggiISO();
-
   return {
-    oggi,
-    soci: filtrati,
+    oggi: oggiISO(),
+    soci,
     totale: soci.length,
   };
 }
