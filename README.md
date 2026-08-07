@@ -205,12 +205,16 @@ un *Preview Deployment* su un URL a sé; un push o merge su `main` aggiorna il
 `vercel-build` applica le migrazioni prima di compilare.
 
 Quando si impostano le variabili d'ambiente, Vercel chiede per quali
-ambienti valgono (*Production*, *Preview*, *Development*). Se si lasciano
-spuntati tutti, un Preview Deployment di un branch di prova punta allo
-**stesso database di produzione**: per un progetto con dati reali dei soci,
-conviene limitare `DATABASE_URL` e `DIRECT_URL` di produzione al solo
-ambiente *Production*, ed eventualmente puntare i Preview a un branch Neon
-separato.
+ambienti valgono (*Production*, *Preview*, *Development*). Le variabili di
+produzione (`DATABASE_URL`, `DIRECT_URL`, `SESSION_SECRET`) vanno limitate al
+solo ambiente *Production*: lasciarle spuntate anche per *Preview* farebbe
+puntare ogni branch di prova allo **stesso database usato dai soci veri**.
+
+Per l'ambiente *Preview* si imposta un secondo set delle stesse tre
+variabili, con lo stesso nome ma scope diverso, puntato a un **branch Neon
+dedicato** (creato da `production` così parte con lo schema corretto e senza
+dati). In questo modo un Preview Deployment può fallire, essere ricreato o
+lasciato aperto per giorni senza toccare mai i dati reali.
 
 ### 3. Il primo amministratore
 
