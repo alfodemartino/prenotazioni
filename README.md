@@ -198,6 +198,20 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Il segreto di produzione deve essere **diverso** da quello di sviluppo: chi lo
 conosce può fabbricarsi un cookie da amministratore.
 
+**Il deploy è automatico, senza comandi manuali.** Vercel osserva il
+repository: un push su un branch qualsiasi (comprese le pull request) genera
+un *Preview Deployment* su un URL a sé; un push o merge su `main` aggiorna il
+*Production Deployment*, cioè il sito pubblico. In entrambi i casi
+`vercel-build` applica le migrazioni prima di compilare.
+
+Quando si impostano le variabili d'ambiente, Vercel chiede per quali
+ambienti valgono (*Production*, *Preview*, *Development*). Se si lasciano
+spuntati tutti, un Preview Deployment di un branch di prova punta allo
+**stesso database di produzione**: per un progetto con dati reali dei soci,
+conviene limitare `DATABASE_URL` e `DIRECT_URL` di produzione al solo
+ambiente *Production*, ed eventualmente puntare i Preview a un branch Neon
+separato.
+
 ### 3. Il primo amministratore
 
 Una volta sola, dal proprio computer, puntando al database di produzione:
