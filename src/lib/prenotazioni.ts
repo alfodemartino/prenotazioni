@@ -257,13 +257,11 @@ export async function salvaPrenotazione(input: {
         socio: {
           stato: socio.stato,
           scadenzaTessera: socio.scadenzaTessera,
-          scadenzaCertificato: socio.scadenzaCertificato,
         },
         ctx,
         vincoli: {
           maxPersonePerPrenotazione: imp.maxPersonePerPrenotazione,
           sogliaUltimiPosti: imp.sogliaUltimiPosti,
-          controlloCertificato: imp.controlloCertificato,
         },
       });
 

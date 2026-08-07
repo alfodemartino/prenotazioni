@@ -99,7 +99,6 @@ specifica, anche su un intervallo di giorni.
 | Tariffa ospite bambino | 5,00 € |
 | Soglia "ultimi posti" | 5 |
 | Massimo persone per prenotazione | 20 |
-| Controllo certificato medico | disattivato |
 
 ## Sicurezza
 

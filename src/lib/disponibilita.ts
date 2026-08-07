@@ -43,13 +43,11 @@ export interface Gruppo {
 export interface StatoSocio {
   stato: string;
   scadenzaTessera: DataISO | null;
-  scadenzaCertificato: DataISO | null;
 }
 
 export interface Vincoli {
   maxPersonePerPrenotazione: number;
   sogliaUltimiPosti: number;
-  controlloCertificato: boolean;
 }
 
 export type StatoGiornata =
@@ -64,7 +62,6 @@ export type CodiceBlocco =
   | "GRUPPO_NON_VALIDO"
   | "SOCIO_SOSPESO"
   | "TESSERA_SCADUTA"
-  | "CERTIFICATO_SCADUTO"
   | "FUORI_FINESTRA"
   | "GIORNATA_CHIUSA"
   | "GIORNATA_TERMINATA"
@@ -213,7 +210,7 @@ export interface RichiestaPrenotazione {
 }
 
 export function verificaPrenotabilita(r: RichiestaPrenotazione): Esito {
-  const { giornata, gruppo, socio, ctx, vincoli } = r;
+  const { giornata, gruppo, socio, ctx } = r;
 
   const erroreGruppo = validaGruppo(gruppo, r.vincoli.maxPersonePerPrenotazione);
   if (erroreGruppo) {
@@ -228,25 +225,13 @@ export function verificaPrenotabilita(r: RichiestaPrenotazione): Esito {
     };
   }
 
-  // Le scadenze si confrontano con il giorno di accesso, non con oggi: una tessera
+  // La scadenza si confronta con il giorno di accesso, non con oggi: una tessera
   // che scade domani non deve consentire di prenotare per dopodomani.
   if (socio.scadenzaTessera && socio.scadenzaTessera < giornata.data) {
     return {
       ok: false,
       codice: "TESSERA_SCADUTA",
       messaggio: `La tua tessera scade il ${formattaData(socio.scadenzaTessera)} e non copre questa giornata.`,
-    };
-  }
-
-  if (
-    vincoli.controlloCertificato &&
-    socio.scadenzaCertificato &&
-    socio.scadenzaCertificato < giornata.data
-  ) {
-    return {
-      ok: false,
-      codice: "CERTIFICATO_SCADUTO",
-      messaggio: `Il tuo certificato medico scade il ${formattaData(socio.scadenzaCertificato)} e non copre questa giornata.`,
     };
   }
 

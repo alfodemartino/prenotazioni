@@ -42,14 +42,13 @@ function gruppo(over: Partial<Gruppo> = {}): Gruppo {
 }
 
 function socio(over: Partial<StatoSocio> = {}): StatoSocio {
-  return { stato: "ATTIVO", scadenzaTessera: null, scadenzaCertificato: null, ...over };
+  return { stato: "ATTIVO", scadenzaTessera: null, ...over };
 }
 
 function vincoli(over: Partial<Vincoli> = {}): Vincoli {
   return {
     maxPersonePerPrenotazione: 20,
     sogliaUltimiPosti: 5,
-    controlloCertificato: false,
     ...over,
   };
 }
@@ -227,16 +226,6 @@ describe("requisiti del socio", () => {
 
     // Ma per oggi stesso sì.
     expect(verifica({ socio: scaduta, giornata: giornata({ data: OGGI }) }).ok).toBe(true);
-  });
-
-  it("controlla il certificato medico solo se l'opzione è attiva", () => {
-    const senzaCertificato = socio({ scadenzaCertificato: "2026-01-01" });
-
-    expect(verifica({ socio: senzaCertificato, vincoli: vincoli({ controlloCertificato: false }) }).ok).toBe(true);
-
-    expect(
-      verifica({ socio: senzaCertificato, vincoli: vincoli({ controlloCertificato: true }) }),
-    ).toMatchObject({ ok: false, codice: "CERTIFICATO_SCADUTO" });
   });
 });
 

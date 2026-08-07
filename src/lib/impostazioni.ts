@@ -21,7 +21,6 @@ export const DEFAULT_IMPOSTAZIONI = {
   tariffaOspiteBambinoCent: 500,
   sogliaUltimiPosti: 5,
   maxPersonePerPrenotazione: 20,
-  controlloCertificato: false,
 } as const;
 
 /** Legge le impostazioni, creandole con i valori di default se non esistono ancora. */
