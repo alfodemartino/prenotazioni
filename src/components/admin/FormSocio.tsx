@@ -28,7 +28,6 @@ export interface ValoriSocio {
   telefono: string | null;
   note: string | null;
   scadenzaTessera: string | null;
-  scadenzaCertificato: string | null;
   ruolo: string;
 }
 
@@ -40,7 +39,6 @@ export const SOCIO_VUOTO: ValoriSocio = {
   telefono: null,
   note: null,
   scadenzaTessera: null,
-  scadenzaCertificato: null,
   ruolo: "SOCIO",
 };
 
@@ -185,19 +183,6 @@ export default function FormSocio({
           <p className={AIUTO}>Oltre questa data non potrà prenotare.</p>
         </div>
 
-        <div>
-          <label htmlFor="scadenzaCertificato" className={ETICHETTA}>
-            Scadenza certificato medico (facoltativa)
-          </label>
-          <input
-            id="scadenzaCertificato"
-            name="scadenzaCertificato"
-            type="date"
-            defaultValue={v("scadenzaCertificato")}
-            className={INPUT}
-          />
-          <p className={AIUTO}>Blocca le prenotazioni solo se il controllo è attivo.</p>
-        </div>
       </div>
 
       <div>

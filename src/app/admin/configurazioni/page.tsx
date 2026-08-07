@@ -40,7 +40,6 @@ export default async function PaginaConfigurazioni({
           tariffaOspiteBambino: centesimiInEuro(imp.tariffaOspiteBambinoCent),
           sogliaUltimiPosti: imp.sogliaUltimiPosti,
           maxPersonePerPrenotazione: imp.maxPersonePerPrenotazione,
-          controlloCertificato: imp.controlloCertificato,
         }}
       />
     </>

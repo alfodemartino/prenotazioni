@@ -92,7 +92,6 @@ export default async function PaginaSocio({
             telefono: socio.telefono,
             note: socio.note,
             scadenzaTessera: socio.scadenzaTessera,
-            scadenzaCertificato: socio.scadenzaCertificato,
             ruolo: socio.ruolo,
           }}
         />
