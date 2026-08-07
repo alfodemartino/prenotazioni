@@ -182,7 +182,6 @@ export default function FormSocio({
           />
           <p className={AIUTO}>Oltre questa data non potrà prenotare.</p>
         </div>
-
       </div>
 
       <div>

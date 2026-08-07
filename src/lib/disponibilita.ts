@@ -210,7 +210,7 @@ export interface RichiestaPrenotazione {
 }
 
 export function verificaPrenotabilita(r: RichiestaPrenotazione): Esito {
-  const { giornata, gruppo, socio, ctx, vincoli } = r;
+  const { giornata, gruppo, socio, ctx } = r;
 
   const erroreGruppo = validaGruppo(gruppo, r.vincoli.maxPersonePerPrenotazione);
   if (erroreGruppo) {
@@ -225,7 +225,7 @@ export function verificaPrenotabilita(r: RichiestaPrenotazione): Esito {
     };
   }
 
-  // Le scadenze si confrontano con il giorno di accesso, non con oggi: una tessera
+  // La scadenza si confronta con il giorno di accesso, non con oggi: una tessera
   // che scade domani non deve consentire di prenotare per dopodomani.
   if (socio.scadenzaTessera && socio.scadenzaTessera < giornata.data) {
     return {

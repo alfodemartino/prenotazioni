@@ -55,11 +55,7 @@ export default async function PaginaPrivacy() {
         <ul className="list-disc space-y-1 pl-5">
           <li>nome, cognome, indirizzo email e numero di tessera;</li>
           <li>numero di telefono, se lo fornisci;</li>
-          <li>
-            data di scadenza della tessera e, se registrata, data di scadenza del
-            certificato medico. <strong>Il certificato non viene conservato</strong>:
-            l&apos;applicazione memorizza soltanto la data entro cui è valido;
-          </li>
+          <li>la data di scadenza della tessera;</li>
           <li>
             le tue prenotazioni: giornata, numero di adulti, bambini e ospiti che ti
             accompagnano;
@@ -99,7 +95,7 @@ export default async function PaginaPrivacy() {
           </li>
           <li>
             <strong>Verificare i requisiti per l&apos;accesso</strong>, come la validità
-            della tessera e del certificato medico.
+            della tessera.
           </li>
         </ul>
       </Sezione>

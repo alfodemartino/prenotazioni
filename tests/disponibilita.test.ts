@@ -227,7 +227,6 @@ describe("requisiti del socio", () => {
     // Ma per oggi stesso sì.
     expect(verifica({ socio: scaduta, giornata: giornata({ data: OGGI }) }).ok).toBe(true);
   });
-
 });
 
 describe("finestra temporale", () => {

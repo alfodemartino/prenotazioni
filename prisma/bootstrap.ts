@@ -33,7 +33,6 @@ const IMPOSTAZIONI_INIZIALI = {
   tariffaOspiteBambinoCent: 500,
   sogliaUltimiPosti: 5,
   maxPersonePerPrenotazione: 20,
-  controlloCertificato: false,
 };
 
 function obbligatoria(nome: string): string {

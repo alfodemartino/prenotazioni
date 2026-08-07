@@ -1,18 +1,28 @@
 // Schema del database — Prenotazioni Piscina
 //
-// In sviluppo si usa SQLite: nessuna installazione, il database è un file.
-// Per passare a PostgreSQL in produzione basta cambiare `provider` qui sotto in
-// "postgresql" e aggiornare DATABASE_URL. Lo schema è scritto per essere
-// compatibile con entrambi: niente enum (non supportati da SQLite), le date-giornata
-// sono stringhe "YYYY-MM-DD" e gli importi sono interi in centesimi.
+// PostgreSQL sia in sviluppo che in produzione. Prisma non permette di scegliere
+// il provider da variabile d'ambiente, e tenere SQLite in locale significherebbe
+// non collaudare mai il percorso che conta davvero: il lock di riga usato per
+// serializzare le prenotazioni concorrenti è `SELECT … FOR UPDATE` su PostgreSQL
+// e un giro diverso su SQLite (src/lib/prenotazioni.ts). Un solo motore, nessuna
+// sorpresa il giorno della pubblicazione.
+//
+// Lo schema resta scritto in modo portabile: niente enum, le date-giornata sono
+// stringhe "YYYY-MM-DD" e gli importi sono interi in centesimi.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+
+  // Connessione condivisa (pooled): è quella che usa l'app a ogni richiesta.
+  url = env("DATABASE_URL")
+
+  // Connessione diretta, senza pooler: la usano solo i comandi della CLI Prisma
+  // (`migrate`, `db push`, `studio`), che hanno bisogno di una sessione stabile.
+  directUrl = env("DIRECT_URL")
 }
 
 /// Tesserato del circolo. Gli account sono creati esclusivamente dall'amministrazione.
@@ -29,9 +39,8 @@ model Socio {
   /// "ATTIVO" | "SOSPESO"
   stato String @default("ATTIVO")
 
-  /// Scadenze in formato "YYYY-MM-DD". NULL = nessuna scadenza da controllare.
-  scadenzaTessera     String?
-  scadenzaCertificato String?
+  /// Scadenza in formato "YYYY-MM-DD". NULL = nessuna scadenza da controllare.
+  scadenzaTessera String?
 
   telefono String?
   note     String?
@@ -147,9 +156,6 @@ model Impostazioni {
   sogliaUltimiPosti Int @default(5)
   /// Tetto di persone per singola prenotazione, contro gli errori di digitazione.
   maxPersonePerPrenotazione Int @default(20)
-
-  /// Se attivo, un certificato medico scaduto blocca le nuove prenotazioni.
-  controlloCertificato Boolean @default(false)
 
   aggiornatoIl DateTime @updatedAt
 }

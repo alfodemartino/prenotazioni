@@ -35,7 +35,6 @@ const IMPOSTAZIONI_INIZIALI = {
   tariffaOspiteBambinoCent: 500,
   sogliaUltimiPosti: 5,
   maxPersonePerPrenotazione: 20,
-  controlloCertificato: false,
 };
 
 // Password volutamente banali e facili da ridigitare: NON rispettano la politica

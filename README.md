@@ -7,10 +7,16 @@ Le regole di funzionamento sono descritte in [SPEC.md](SPEC.md).
 
 ## Avvio
 
+Serve un database PostgreSQL. Il modo più rapido per averne uno senza installare
+niente è creare un progetto gratuito su [Neon](https://neon.com) e usare un
+**branch di sviluppo** separato da quello di produzione; in alternativa va bene un
+PostgreSQL locale.
+
 ```bash
+cp .env.example .env   # e riempire DATABASE_URL, DIRECT_URL, SESSION_SECRET
 npm install
-npm run setup   # crea il database SQLite e lo popola
-npm run dev     # http://localhost:3000
+npm run setup          # applica le migrazioni e popola il database
+npm run dev            # http://localhost:3000
 ```
 
 Account creati dal seed:
@@ -22,14 +28,16 @@ Account creati dal seed:
 | Socio | `luca.bianchi@example.it` | `socio1234` |
 | Socio | `giulia.verdi@example.it` | `socio1234` |
 
-## Comandi
+## Comandi 
 
 | Comando | Cosa fa |
 |---|---|
 | `npm run dev` | Avvia l'app in sviluppo |
-| `npm test` | Esegue i test del motore di disponibilità |
+| `npm test` | Esegue i test del motore di disponibilità (non serve il database) |
 | `npm run test:watch` | Test in modalità continua |
-| `npm run db:push` | Allinea il database allo schema Prisma |
+| `npm run db:migrate` | Crea e applica una migrazione dopo una modifica allo schema |
+| `npm run db:deploy` | Applica le migrazioni esistenti (è ciò che gira in produzione) |
+| `npm run db:push` | Allinea il database allo schema senza creare una migrazione |
 | `npm run db:seed` | Ricarica i dati iniziali **di sviluppo** (account con password note) |
 | `npm run db:bootstrap` | Primo avvio in **produzione**: solo impostazioni e amministratore |
 | `npm run db:studio` | Apre l'esploratore del database |
@@ -91,7 +99,6 @@ specifica, anche su un intervallo di giorni.
 | Tariffa ospite bambino | 5,00 € |
 | Soglia "ultimi posti" | 5 |
 | Massimo persone per prenotazione | 20 |
-| Controllo certificato medico | disattivato |
 
 ## Sicurezza
 
@@ -148,33 +155,97 @@ Nota: gli account creati da `npm run db:seed` hanno password volutamente banali
 (`socio1234` e simili) che **non** rispettano questa politica. Servono solo a provare
 l'app in locale; in produzione gli account si creano con `db:bootstrap`, che la applica.
 
-## Passaggio a PostgreSQL
+## Pubblicazione su Vercel + Neon
 
-In sviluppo si usa SQLite, che non richiede installazione. Per la produzione:
+### 1. Il database (Neon)
 
-1. In `prisma/schema.prisma` cambiare `provider = "sqlite"` in `"postgresql"`.
-2. Impostare `DATABASE_URL` con la stringa di connessione.
-3. Generare un `SESSION_SECRET` nuovo:
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   ```
-4. `npx prisma migrate deploy`
+Creare un progetto su [Neon](https://neon.com) scegliendo una **regione europea**
+(es. Frankfurt): i dati trattati sono anagrafiche di soci, e tenerli nell'UE
+semplifica gli adempimenti. Il piano gratuito è ampiamente sufficiente per un
+circolo di qualche centinaio di tesserati.
 
-Lo schema è già scritto per essere compatibile con entrambi i motori. Il blocco
-di riga usato per serializzare le prenotazioni concorrenti diventa un
-`SELECT … FOR UPDATE` su PostgreSQL: la commutazione è automatica e dipende dal
-prefisso di `DATABASE_URL`.
+Dal pannello si copiano **due** stringhe di connessione allo stesso database:
+
+- quella **pooled** (ha `-pooler` nel nome dell'host) → `DATABASE_URL`
+- quella **diretta** (senza `-pooler`) → `DIRECT_URL`
+
+La distinzione conta: l'app apre e chiude connessioni a ogni richiesta e ha
+bisogno del pooler, mentre `prisma migrate` vuole una sessione stabile e deve
+passare dalla connessione diretta.
+
+È comodo creare anche un **branch di sviluppo** nello stesso progetto Neon, da
+usare in locale: costa zero e tiene i dati di prova lontani da quelli veri.
+
+### 2. L'applicazione (Vercel)
+
+Importare il repository da GitHub. Vercel riconosce Next.js da solo; non serve
+configurare comandi di build, perché il progetto espone già uno script
+`vercel-build` che applica le migrazioni prima di compilare.
+
+Variabili d'ambiente da impostare nel progetto Vercel:
+
+| Variabile | Valore |
+|---|---|
+| `DATABASE_URL` | connessione **pooled** di Neon |
+| `DIRECT_URL` | connessione **diretta** di Neon |
+| `SESSION_SECRET` | stringa nuova di almeno 32 caratteri (vedi sotto) |
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Il segreto di produzione deve essere **diverso** da quello di sviluppo: chi lo
+conosce può fabbricarsi un cookie da amministratore.
+
+**Il deploy è automatico, senza comandi manuali.** Vercel osserva il
+repository: un push su un branch qualsiasi (comprese le pull request) genera
+un *Preview Deployment* su un URL a sé; un push o merge su `main` aggiorna il
+*Production Deployment*, cioè il sito pubblico. In entrambi i casi
+`vercel-build` applica le migrazioni prima di compilare.
+
+Quando si impostano le variabili d'ambiente, Vercel chiede per quali
+ambienti valgono (*Production*, *Preview*, *Development*). Le variabili di
+produzione (`DATABASE_URL`, `DIRECT_URL`, `SESSION_SECRET`) vanno limitate al
+solo ambiente *Production*: lasciarle spuntate anche per *Preview* farebbe
+puntare ogni branch di prova allo **stesso database usato dai soci veri**.
+
+Per l'ambiente *Preview* si imposta un secondo set delle stesse tre
+variabili, con lo stesso nome ma scope diverso, puntato a un **branch Neon
+dedicato** (creato da `production` così parte con lo schema corretto e senza
+dati). In questo modo un Preview Deployment può fallire, essere ricreato o
+lasciato aperto per giorni senza toccare mai i dati reali.
+
+### 3. Il primo amministratore
+
+Una volta sola, dal proprio computer, puntando al database di produzione:
+
+```bash
+DATABASE_URL="<diretta di Neon>" DIRECT_URL="<diretta di Neon>" \
+ADMIN_EMAIL="segreteria@circolo.it" ADMIN_PASSWORD="<password lunga>" \
+ADMIN_NOME="Anna" ADMIN_COGNOME="Bianchi" \
+npm run db:bootstrap
+```
+
+`db:bootstrap` crea le impostazioni e **un solo** account amministratore. Non usare
+mai `db:seed` in produzione: crea utenti con password note, e si rifiuta comunque
+di partire con `NODE_ENV=production`.
+
+### Nota sul piano gratuito
+
+Il piano **Hobby** di Vercel è riservato all'uso non commerciale: va bene per far
+provare l'app al circolo, ma quando diventa lo strumento ufficiale con cui il
+circolo lavora serve il piano Pro. Il passaggio non comporta modifiche al codice.
 
 ## Lista di controllo prima di pubblicare
 
-- [ ] Database PostgreSQL creato e `DATABASE_URL` impostata
+- [ ] Progetto Neon creato in **regione europea**, `DATABASE_URL` (pooled) e `DIRECT_URL` (diretta) impostate su Vercel
 - [ ] `SESSION_SECRET` nuovo, almeno 32 caratteri, **diverso** da quello di sviluppo
-- [ ] Migrazioni applicate (`prisma migrate deploy`), non `db push`
+- [ ] Primo deploy riuscito (le migrazioni vengono applicate da `vercel-build`)
 - [ ] `npm run db:bootstrap` eseguito con `ADMIN_EMAIL` e `ADMIN_PASSWORD`
 - [ ] Verificato che **non** esistano gli account di prova (`maria.rossi@example.it` e simili)
 - [ ] Password iniziale dell'amministratore cambiata al primo accesso
 - [ ] Segnaposto `[DA COMPLETARE]` compilati in `/privacy`
-- [ ] Accordi da responsabile del trattamento accettati con hosting e database
+- [ ] Accordi da responsabile del trattamento accettati con Vercel e Neon
 - [ ] Valori reali impostati in Amministrazione → Configurazioni
 - [ ] Il file `.env` **non** è finito nel repository (è già in `.gitignore`)
 
