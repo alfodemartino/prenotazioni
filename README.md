@@ -28,7 +28,7 @@ Account creati dal seed:
 | Socio | `luca.bianchi@example.it` | `socio1234` |
 | Socio | `giulia.verdi@example.it` | `socio1234` |
 
-## Comandi
+## Comandi 
 
 | Comando | Cosa fa |
 |---|---|
