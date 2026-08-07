@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { elencoSoci } from "@/lib/admin";
-import { BOTTONE_PRIMARIO, INPUT, RIQUADRO } from "@/components/admin/stili";
+import { BOTTONE_PRIMARIO, BOTTONE_SECONDARIO, INPUT, RIQUADRO } from "@/components/admin/stili";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +33,14 @@ export default async function PaginaSoci({
             {totale} {totale === 1 ? "profilo registrato" : "profili registrati"}
           </p>
         </div>
-        <Link href="/admin/soci/nuovo" className={BOTTONE_PRIMARIO}>
-          Nuovo socio
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/soci/importa" className={BOTTONE_SECONDARIO}>
+            Importa da CSV
+          </Link>
+          <Link href="/admin/soci/nuovo" className={BOTTONE_PRIMARIO}>
+            Nuovo socio
+          </Link>
+        </div>
       </div>
 
       <form method="get" className="mb-5 flex gap-2">
