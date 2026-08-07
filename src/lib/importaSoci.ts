@@ -36,7 +36,6 @@ export type ChiaveColonna =
   | "email"
   | "telefono"
   | "scadenzaTessera"
-  | "scadenzaCertificato"
   | "note";
 
 export interface Colonna {
@@ -58,12 +57,6 @@ export const COLONNE: Colonna[] = [
     obbligatoria: false,
     esempio: "31/12/2026",
   },
-  {
-    chiave: "scadenzaCertificato",
-    intestazione: "Scadenza certificato",
-    obbligatoria: false,
-    esempio: "30/06/2027",
-  },
   { chiave: "note", intestazione: "Note", obbligatoria: false, esempio: "" },
 ];
 
@@ -76,7 +69,6 @@ export interface RigaSocio {
   email: string;
   telefono: string | null;
   scadenzaTessera: string | null;
-  scadenzaCertificato: string | null;
   note: string | null;
 }
 
@@ -116,13 +108,6 @@ const ALIAS: Record<ChiaveColonna, string[]> = {
   email: ["email", "mail", "indirizzoemail", "posta", "postaelettronica"],
   telefono: ["telefono", "tel", "cellulare", "cell", "recapito"],
   scadenzaTessera: ["scadenzatessera", "tesserascadenza", "scadtessera"],
-  scadenzaCertificato: [
-    "scadenzacertificato",
-    "certificato",
-    "scadenzacertificatomedico",
-    "certificatomedico",
-    "scadcertificato",
-  ],
   note: ["note", "nota", "annotazioni"],
 };
 
@@ -232,20 +217,15 @@ export function interpretaCsvSoci(griglia: string[][]): EsitoAnalisi {
       return scarta(email ? `L'email «${email}» non è valida.` : "Manca l'email.");
     }
 
-    const scadenze: Record<string, string | null> = {};
-    for (const chiave of ["scadenzaTessera", "scadenzaCertificato"] as const) {
-      const grezzo = leggi(celle, chiave);
-      if (grezzo === "") {
-        scadenze[chiave] = null;
-        continue;
+    const grezzaScadenza = leggi(celle, "scadenzaTessera");
+    let scadenzaTessera: string | null = null;
+    if (grezzaScadenza !== "") {
+      scadenzaTessera = normalizzaData(grezzaScadenza);
+      if (!scadenzaTessera) {
+        return scarta(
+          `La scadenza tessera «${grezzaScadenza}» non è una data valida (usa 31/12/2026).`,
+        );
       }
-
-      const iso = normalizzaData(grezzo);
-      if (!iso) {
-        const etichetta = COLONNE.find((c) => c.chiave === chiave)!.intestazione.toLowerCase();
-        return scarta(`La ${etichetta} «${grezzo}» non è una data valida (usa 31/12/2026).`);
-      }
-      scadenze[chiave] = iso;
     }
 
     const emailPrecedente = emailViste.get(email);
@@ -266,8 +246,7 @@ export function interpretaCsvSoci(griglia: string[][]): EsitoAnalisi {
       cognome,
       email,
       telefono: leggi(celle, "telefono") || null,
-      scadenzaTessera: scadenze.scadenzaTessera,
-      scadenzaCertificato: scadenze.scadenzaCertificato,
+      scadenzaTessera,
       note: leggi(celle, "note") || null,
     });
   });

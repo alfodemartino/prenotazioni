@@ -69,7 +69,6 @@ export async function salvaConfigurazioni(_prec: StatoForm, fd: FormData): Promi
     tariffaOspiteBambinoCent: tariffaBambino,
     sogliaUltimiPosti: intero(fd, "sogliaUltimiPosti"),
     maxPersonePerPrenotazione: intero(fd, "maxPersonePerPrenotazione"),
-    controlloCertificato: booleano(fd, "controlloCertificato"),
   };
 
   const problema = validaImpostazioni({
@@ -279,7 +278,6 @@ function leggiAnagrafica(fd: FormData) {
     telefono: testoOpzionale(fd, "telefono"),
     note: testoOpzionale(fd, "note"),
     scadenzaTessera: testoOpzionale(fd, "scadenzaTessera"),
-    scadenzaCertificato: testoOpzionale(fd, "scadenzaCertificato"),
   };
 }
 
@@ -534,7 +532,6 @@ export async function importaSoci(_prec: StatoImport, fd: FormData): Promise<Sta
         telefono: r.telefono,
         note: r.note,
         scadenzaTessera: r.scadenzaTessera,
-        scadenzaCertificato: r.scadenzaCertificato,
         ruolo: "SOCIO",
         stato: "ATTIVO",
         passwordHash: hash[i],

@@ -56,8 +56,7 @@ simultanee possono superare il limite.
 Un socio può prenotare se:
 
 - stato = `ATTIVO` (non sospeso);
-- tessera non scaduta;
-- certificato medico non scaduto (se il controllo è attivo).
+- tessera non scaduta.
 
 Quando una condizione decade, le prenotazioni **future già confermate restano valide**
 (la revoca è una decisione dell'admin, non un effetto automatico).
@@ -132,8 +131,8 @@ Stati mostrati sulla scheda giornata:
    ospiti), check-in con spunta e correzione dei numeri effettivi all'ingresso.
 2. **Calendario** — capienza per singolo giorno, chiusure straordinarie (manutenzione,
    meteo, festività), orari di apertura, valore di overbooking.
-3. **Soci** — creazione e modifica anagrafiche, sospensione, scadenze tessera e
-   certificato, reset password, prenotazione per conto del socio.
+3. **Soci** — creazione e modifica anagrafiche, sospensione, scadenza tessera,
+   reset password, prenotazione per conto del socio.
 4. **Report** — affluenza per giorno, ospiti portati per socio, tasso di no-show,
    occupazione media, esportazione CSV.
 
@@ -144,7 +143,7 @@ Stati mostrati sulla scheda giornata:
 ```
 Socio            id, numeroTessera, nome, cognome, email, passwordHash,
                  ruolo (SOCIO | ADMIN), stato (ATTIVO | SOSPESO),
-                 scadenzaTessera, scadenzaCertificato, telefono, note
+                 scadenzaTessera, telefono, note
 
 Giornata         data (PK), stato (APERTO | CHIUSO), capienzaAdulti,
                  overbookingPct, oraApertura, oraChiusura, nota
@@ -159,7 +158,7 @@ Prenotazione     id, socioId, data, adulti, bambini, ospitiAdulti, ospitiBambini
 Impostazioni     capienzaDefault, overbookingPct, giorniFinestra (2),
                  oraAperturaDefault, oraChiusuraDefault,
                  tariffaOspiteAdulto, tariffaOspiteBambino,
-                 sogliaUltimiPosti, controlloCertificatoAttivo
+                 sogliaUltimiPosti
 ```
 
 **Vincoli di validazione**: `adulti ≥ 1` (il socio prenotante è incluso nel conteggio),

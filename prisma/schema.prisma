@@ -39,9 +39,8 @@ model Socio {
   /// "ATTIVO" | "SOSPESO"
   stato String @default("ATTIVO")
 
-  /// Scadenze in formato "YYYY-MM-DD". NULL = nessuna scadenza da controllare.
-  scadenzaTessera     String?
-  scadenzaCertificato String?
+  /// Scadenza in formato "YYYY-MM-DD". NULL = nessuna scadenza da controllare.
+  scadenzaTessera String?
 
   telefono String?
   note     String?
@@ -157,9 +156,6 @@ model Impostazioni {
   sogliaUltimiPosti Int @default(5)
   /// Tetto di persone per singola prenotazione, contro gli errori di digitazione.
   maxPersonePerPrenotazione Int @default(20)
-
-  /// Se attivo, un certificato medico scaduto blocca le nuove prenotazioni.
-  controlloCertificato Boolean @default(false)
 
   aggiornatoIl DateTime @updatedAt
 }

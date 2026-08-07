@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { salvaConfigurazioni } from "@/app/admin/azioni";
 import Avviso from "./Avviso";
-import { campo, spunta } from "./valori";
+import { campo } from "./valori";
 import { AIUTO, BOTTONE_PRIMARIO, ETICHETTA, INPUT, RIQUADRO } from "./stili";
 
 export interface ValoriConfigurazioni {
@@ -17,7 +17,6 @@ export interface ValoriConfigurazioni {
   tariffaOspiteBambino: string;
   sogliaUltimiPosti: number;
   maxPersonePerPrenotazione: number;
-  controlloCertificato: boolean;
 }
 
 function Sezione({
@@ -226,28 +225,6 @@ export default function FormConfigurazioni({ valori }: { valori: ValoriConfigura
             className={INPUT}
           />
         </div>
-      </Sezione>
-
-      <Sezione
-        titolo="Controlli sui soci"
-        descrizione="La tessera scaduta blocca sempre le prenotazioni; il certificato solo se lo attivi qui."
-      >
-        <label className="flex items-start gap-3 sm:col-span-2">
-          <input
-            type="checkbox"
-            name="controlloCertificato"
-            defaultChecked={spunta(stato, "controlloCertificato", valori.controlloCertificato)}
-            className="mt-1 h-5 w-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-          />
-          <span>
-            <span className="font-medium text-slate-900">
-              Blocca chi ha il certificato medico scaduto
-            </span>
-            <span className={AIUTO}>
-              Si applica solo ai soci che hanno una data di scadenza registrata.
-            </span>
-          </span>
-        </label>
       </Sezione>
 
       <Avviso stato={stato} />

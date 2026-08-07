@@ -9,7 +9,7 @@ import {
 } from "@/lib/importaSoci";
 
 const INTESTAZIONI =
-  "Numero tessera;Nome;Cognome;Email;Telefono;Scadenza tessera;Scadenza certificato;Note";
+  "Numero tessera;Nome;Cognome;Email;Telefono;Scadenza tessera;Note";
 
 /** Costruisce un CSV con le intestazioni ufficiali più le righe indicate. */
 function csv(...righe: string[]) {
@@ -55,7 +55,7 @@ describe("date", () => {
 describe("interpretazione del file", () => {
   it("legge una riga completa", () => {
     const esito = csv(
-      "0042;Maria;Rossi;Maria.Rossi@Example.IT;333 1234567;31/12/2026;30/06/2027;socia storica",
+      "0042;Maria;Rossi;Maria.Rossi@Example.IT;333 1234567;31/12/2026;socia storica",
     );
 
     expect(esito.erroreFatale).toBeNull();
@@ -68,17 +68,15 @@ describe("interpretazione del file", () => {
       // L'email va normalizzata, altrimenti lo stesso socio potrebbe entrare due volte.
       email: "maria.rossi@example.it",
       scadenzaTessera: "2026-12-31",
-      scadenzaCertificato: "2027-06-30",
       note: "socia storica",
     });
   });
 
   it("tratta le colonne facoltative vuote come assenti, non come stringhe vuote", () => {
-    const esito = csv("0042;Maria;Rossi;maria@example.it;;;;");
+    const esito = csv("0042;Maria;Rossi;maria@example.it;;;");
     expect(esito.righe[0]).toMatchObject({
       telefono: null,
       scadenzaTessera: null,
-      scadenzaCertificato: null,
       note: null,
     });
   });

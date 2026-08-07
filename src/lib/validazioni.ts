@@ -90,7 +90,6 @@ export interface SocioInput {
   email: string;
   numeroTessera: string;
   scadenzaTessera: string | null;
-  scadenzaCertificato: string | null;
 }
 
 export function validaSocio(i: SocioInput): string | null {
@@ -99,11 +98,8 @@ export function validaSocio(i: SocioInput): string | null {
   if (!i.numeroTessera.trim()) return "Il numero di tessera è obbligatorio.";
   if (!emailPlausibile(normalizzaEmail(i.email))) return "L'indirizzo email non è valido.";
 
-  for (const [valore, nome] of [
-    [i.scadenzaTessera, "della tessera"],
-    [i.scadenzaCertificato, "del certificato medico"],
-  ] as const) {
-    if (valore && !isDataISO(valore)) return `La data di scadenza ${nome} non è valida.`;
+  if (i.scadenzaTessera && !isDataISO(i.scadenzaTessera)) {
+    return "La data di scadenza della tessera non è valida.";
   }
 
   return null;

@@ -104,7 +104,6 @@ describe("anagrafica socio", () => {
     email: "maria.rossi@example.it",
     numeroTessera: "0001",
     scadenzaTessera: null,
-    scadenzaCertificato: null,
   };
 
   it("accetta un'anagrafica completa", () => {
@@ -125,7 +124,7 @@ describe("anagrafica socio", () => {
 
   it("rifiuta scadenze inesistenti ma accetta l'assenza di scadenza", () => {
     expect(validaSocio({ ...base, scadenzaTessera: "2026-02-30" })).toMatch(/tessera/);
-    expect(validaSocio({ ...base, scadenzaCertificato: "31/12/2026" })).toMatch(/certificato/);
+    expect(validaSocio({ ...base, scadenzaTessera: "31/12/2026" })).toMatch(/tessera/);
     expect(validaSocio({ ...base, scadenzaTessera: "2026-12-31" })).toBeNull();
   });
 

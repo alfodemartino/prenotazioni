@@ -68,9 +68,6 @@ export default async function PaginaSoci({
         <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
           {soci.map((s) => {
             const tesseraScaduta = Boolean(s.scadenzaTessera && s.scadenzaTessera < oggi);
-            const certificatoScaduto = Boolean(
-              s.scadenzaCertificato && s.scadenzaCertificato < oggi,
-            );
 
             return (
               <li key={s.id}>
@@ -91,9 +88,6 @@ export default async function PaginaSoci({
                     {s.ruolo === "ADMIN" && <Etichetta testo="Admin" tono="grigio" />}
                     {s.stato !== "ATTIVO" && <Etichetta testo="Sospeso" tono="rosso" />}
                     {tesseraScaduta && <Etichetta testo="Tessera scaduta" tono="rosso" />}
-                    {certificatoScaduto && (
-                      <Etichetta testo="Certificato scaduto" tono="ambra" />
-                    )}
                   </div>
                 </Link>
               </li>
