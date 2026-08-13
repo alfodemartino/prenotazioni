@@ -15,7 +15,7 @@ export default function NavAdmin() {
   const percorso = usePathname();
 
   return (
-    <nav className="border-b border-slate-200 bg-white">
+    <nav className="border-b border-slate-200 bg-superficie">
       <div className="mx-auto flex max-w-4xl gap-1 overflow-x-auto px-4">
         {VOCI.map((v) => {
           // "/admin" corrisponde solo a sé stesso, le altre voci anche alle sottopagine.

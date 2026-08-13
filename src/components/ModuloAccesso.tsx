@@ -19,7 +19,7 @@ export default function ModuloAccesso() {
           autoComplete="email"
           required
           defaultValue={stato?.valori?.email}
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
+          className="w-full rounded-xl border-0 bg-superficie px-4 py-3 text-base ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
         />
       </div>
 
@@ -33,7 +33,7 @@ export default function ModuloAccesso() {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
+          className="w-full rounded-xl border-0 bg-superficie px-4 py-3 text-base ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
         />
       </div>
 
@@ -49,7 +49,7 @@ export default function ModuloAccesso() {
       <button
         type="submit"
         disabled={inCorso}
-        className="w-full rounded-xl bg-sky-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-sky-700 disabled:opacity-60"
+        className="w-full rounded-xl bg-sky-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-sky-800 disabled:opacity-60"
       >
         {inCorso ? "Accesso in corso…" : "Accedi"}
       </button>

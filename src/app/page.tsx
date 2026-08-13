@@ -67,7 +67,7 @@ export default async function Home({
             return (
               <article
                 key={g.data}
-                className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
+                className="overflow-hidden rounded-2xl bg-superficie shadow-sm ring-1 ring-slate-200"
               >
                 <div className="flex items-start justify-between gap-3 p-5 pb-4">
                   <div className="min-w-0">
@@ -85,7 +85,7 @@ export default async function Home({
 
                 {mia ? (
                   <div className="border-t border-slate-100 bg-sky-50/60 px-5 py-4">
-                    <p className="text-sm font-semibold text-sky-900">La tua prenotazione</p>
+                    <p className="text-sm font-semibold text-sky-700">La tua prenotazione</p>
                     <p className="mt-1 text-slate-800">{descriviGruppo(mia)}</p>
                     {costo > 0 && (
                       <p className="mt-1 text-sm text-slate-600">
@@ -96,7 +96,7 @@ export default async function Home({
                     <div className="mt-4 flex items-stretch gap-2">
                       <Link
                         href={`/prenota/${g.data}`}
-                        className="flex-1 rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-sky-700 ring-1 ring-sky-200 transition active:bg-sky-50"
+                        className="flex-1 rounded-xl bg-superficie px-4 py-3 text-center text-sm font-semibold text-sky-700 ring-1 ring-sky-200 transition active:bg-sky-50"
                       >
                         Modifica
                       </Link>
@@ -117,7 +117,7 @@ export default async function Home({
                     )}
                     <Link
                       href={`/prenota/${g.data}`}
-                      className="block rounded-xl bg-sky-600 px-4 py-3 text-center font-semibold text-white shadow-sm transition active:bg-sky-700"
+                      className="block rounded-xl bg-sky-600 px-4 py-3 text-center font-semibold text-white shadow-sm transition active:bg-sky-800"
                     >
                       Prenota
                     </Link>

@@ -10,7 +10,7 @@ const GIORNI_PREDEFINITI = 30;
 
 function Stat({ etichetta, valore, nota }: { etichetta: string; valore: string | number; nota?: string }) {
   return (
-    <div className="rounded-xl bg-white p-4 ring-1 ring-slate-200">
+    <div className="rounded-xl bg-superficie p-4 ring-1 ring-slate-200">
       <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">{etichetta}</p>
       <p className="mt-1 text-2xl font-bold tabular-nums text-slate-900">{valore}</p>
       {nota && <p className="mt-0.5 text-xs text-slate-500">{nota}</p>}
@@ -52,13 +52,13 @@ export default async function PaginaReport({
         </label>
         <button
           type="submit"
-          className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
+          className="rounded-xl bg-superficie px-4 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
         >
           Aggiorna
         </button>
         <Link
           href={`/admin/report/csv?da=${da}&a=${a}`}
-          className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-sky-700 ring-1 ring-sky-200"
+          className="rounded-xl bg-superficie px-4 py-2.5 text-sm font-semibold text-sky-700 ring-1 ring-sky-200"
         >
           Scarica CSV
         </Link>
@@ -110,7 +110,7 @@ export default async function PaginaReport({
             Nessuna attività nel periodo selezionato.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+          <div className="overflow-x-auto rounded-2xl bg-superficie shadow-sm ring-1 ring-slate-200">
             <table className="w-full text-sm">
               <thead className="border-b border-slate-200 text-left text-xs tracking-wide text-slate-500 uppercase">
                 <tr>
@@ -169,7 +169,7 @@ export default async function PaginaReport({
             Nessun ospite registrato nel periodo.
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+          <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie shadow-sm ring-1 ring-slate-200">
             {classificaOspiti.map((s) => (
               <li key={s.tessera} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">

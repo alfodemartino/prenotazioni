@@ -166,7 +166,7 @@ export default function RigaPresenza({
       {correggi && checkInPossibile && (
         <form
           action={registraCheckIn}
-          className="mt-3 rounded-xl bg-white p-3 ring-1 ring-slate-200"
+          className="mt-3 rounded-xl bg-superficie p-3 ring-1 ring-slate-200"
         >
           <input type="hidden" name="prenotazioneId" value={p.id} />
           <p className="mb-2 text-sm text-slate-600">
