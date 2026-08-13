@@ -36,7 +36,7 @@ export default async function PaginaStorico() {
           </h2>
 
           {prossime.length === 0 ? (
-            <p className="rounded-2xl bg-white p-5 text-sm text-slate-500 ring-1 ring-slate-200">
+            <p className="rounded-2xl bg-superficie p-5 text-sm text-slate-500 ring-1 ring-slate-200">
               Non hai prenotazioni attive.
             </p>
           ) : (
@@ -46,7 +46,7 @@ export default async function PaginaStorico() {
                 return (
                   <article
                     key={p.id}
-                    className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
+                    className="rounded-2xl bg-superficie p-5 shadow-sm ring-1 ring-slate-200"
                   >
                     <p className="font-semibold text-slate-900">{dataEstesa(p.data)}</p>
                     <p className="mt-1 text-slate-700">{descriviGruppo(p)}</p>
@@ -59,7 +59,7 @@ export default async function PaginaStorico() {
                     <div className="mt-4 flex items-stretch gap-2">
                       <Link
                         href={`/prenota/${p.data}`}
-                        className="flex-1 rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-sky-700 ring-1 ring-sky-200 transition active:bg-sky-50"
+                        className="flex-1 rounded-xl bg-superficie px-4 py-3 text-center text-sm font-semibold text-sky-700 ring-1 ring-sky-200 transition active:bg-sky-50"
                       >
                         Modifica
                       </Link>
@@ -80,11 +80,11 @@ export default async function PaginaStorico() {
           </h2>
 
           {passate.length === 0 ? (
-            <p className="rounded-2xl bg-white p-5 text-sm text-slate-500 ring-1 ring-slate-200">
+            <p className="rounded-2xl bg-superficie p-5 text-sm text-slate-500 ring-1 ring-slate-200">
               Ancora nessuna giornata alle spalle.
             </p>
           ) : (
-            <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+            <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie ring-1 ring-slate-200">
               {passate.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
                   <div className="min-w-0">

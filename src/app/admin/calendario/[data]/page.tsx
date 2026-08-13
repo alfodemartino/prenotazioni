@@ -47,15 +47,15 @@ export default async function PaginaGiornata({
       </p>
 
       <div className="mt-5 mb-6 flex flex-wrap gap-3 text-sm">
-        <span className="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-200">
+        <span className="rounded-lg bg-superficie px-3 py-2 ring-1 ring-slate-200">
           {totali.prenotazioni} prenotazioni
         </span>
-        <span className="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-200">
+        <span className="rounded-lg bg-superficie px-3 py-2 ring-1 ring-slate-200">
           {totali.adulti} adulti · {totali.bambini} bambini · {totali.ospiti} ospiti
         </span>
         <Link
           href={`/admin?data=${data}`}
-          className="rounded-lg bg-white px-3 py-2 font-medium text-sky-700 ring-1 ring-slate-200"
+          className="rounded-lg bg-superficie px-3 py-2 font-medium text-sky-700 ring-1 ring-slate-200"
         >
           Apri il registro del giorno
         </Link>

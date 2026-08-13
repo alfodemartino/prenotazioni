@@ -99,7 +99,7 @@ export default function SearchableSociList({
           {ricerca ? `Nessun socio trovato per «${q.trim()}».` : "Non c'è ancora nessun socio."}
         </p>
       ) : (
-        <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie shadow-sm ring-1 ring-slate-200">
           {filtrati.map((s) => {
             const tesseraScaduta = Boolean(s.scadenzaTessera && s.scadenzaTessera < oggi);
 

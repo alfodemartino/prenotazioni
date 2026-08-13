@@ -82,7 +82,7 @@ export default function FormPrenotazione({
     <form action={azione} className="space-y-4">
       <input type="hidden" name="data" value={data} />
 
-      <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+      <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie ring-1 ring-slate-200">
         {righe.map(({ campo, titolo, nota }) => (
           <div key={campo} className="flex items-center gap-3 p-4">
             <div className="min-w-0 flex-1">
@@ -122,7 +122,7 @@ export default function FormPrenotazione({
         ))}
       </div>
 
-      <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+      <div className="rounded-2xl bg-superficie p-4 ring-1 ring-slate-200">
         <div className="flex items-baseline justify-between">
           <span className="text-slate-600">In totale</span>
           <span className="font-semibold">{persone(totale)}</span>
@@ -152,7 +152,7 @@ export default function FormPrenotazione({
       <button
         type="submit"
         disabled={inCorso}
-        className="w-full rounded-xl bg-sky-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-sky-700 disabled:opacity-60"
+        className="w-full rounded-xl bg-sky-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-sky-800 disabled:opacity-60"
       >
         {inCorso ? "Attendi…" : modifica ? "Salva le modifiche" : "Conferma la prenotazione"}
       </button>

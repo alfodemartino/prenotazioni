@@ -25,7 +25,7 @@ function Stat({
   return (
     <div
       className={`rounded-xl p-4 ring-1 ${
-        evidenzia ? "bg-amber-50 ring-amber-200" : "bg-white ring-slate-200"
+        evidenzia ? "bg-amber-50 ring-amber-200" : "bg-superficie ring-slate-200"
       }`}
     >
       <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">{etichetta}</p>
@@ -63,7 +63,7 @@ export default async function PaginaRegistro({
         <Link
           href={`/admin?data=${addGiorni(data, -1)}`}
           aria-label="Giorno precedente"
-          className="rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
+          className="rounded-xl bg-superficie px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
         >
           ←
         </Link>
@@ -71,7 +71,7 @@ export default async function PaginaRegistro({
         <Link
           href={`/admin?data=${addGiorni(data, 1)}`}
           aria-label="Giorno successivo"
-          className="rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
+          className="rounded-xl bg-superficie px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
         >
           →
         </Link>
@@ -150,7 +150,7 @@ export default async function PaginaRegistro({
             Nessuna prenotazione per questa giornata.
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+          <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie shadow-sm ring-1 ring-slate-200">
             {attive.map((p) => (
               <RigaPresenza
                 key={p.id}
@@ -168,7 +168,7 @@ export default async function PaginaRegistro({
           <summary className="cursor-pointer text-sm font-medium text-slate-600">
             Prenotazioni annullate ({annullate.length})
           </summary>
-          <ul className="mt-3 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+          <ul className="mt-3 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie ring-1 ring-slate-200">
             {annullate.map((p) => (
               <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
                 <span className="text-sm text-slate-600">

@@ -1,13 +1,95 @@
 @import "tailwindcss";
 
+/*
+ * Il tema scuro si attiva da una classe sull'`<html>`, non da
+ * `prefers-color-scheme`: l'interruttore deve poter contraddire il sistema
+ * operativo, e chi non tocca nulla parte comunque dalla preferenza di sistema
+ * (ci pensa lo script in `layout.tsx`).
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     sans-serif;
+
+  /*
+   * Sfondo delle schede. Serve un token dedicato invece di `bg-white` perché in
+   * questo progetto il bianco significa due cose opposte — la superficie delle
+   * schede e il testo dei bottoni pieni — e al buio solo la prima deve scurirsi.
+   */
+  --color-superficie: #ffffff;
+
+  /* Sfondo della pagina, sotto le schede. */
+  --color-fondo: #f8fafc;
+  --color-fondo-alto: #f0f9ff;
 }
 
 :root {
   color-scheme: light;
+}
+
+/*
+ * Tema scuro.
+ *
+ * Deve stare dopo `:root`: entrambi i selettori colpiscono l'`<html>` con la
+ * stessa specificità, quindi a decidere è l'ordine di scrittura — invertirlo
+ * lascerebbe `color-scheme: light` a vincere, e i calendari e gli orologi
+ * nativi resterebbero bianchi in mezzo alla pagina scura.
+ *
+ * Invece di raddoppiare le classi in tutte le pagine con varianti `dark:`, qui
+ * si riscrivono i colori a cui quelle classi già puntano: Tailwind genera le
+ * utility come `var(--color-slate-900)`, quindi ridefinire la variabile sposta
+ * ogni `text-slate-900` del progetto in un colpo solo. La scala slate viene
+ * ribaltata (il 900 diventa il più chiaro), così "scuro" e "chiaro" restano
+ * l'uno il negativo dell'altro senza dover ripensare ogni schermata.
+ *
+ * Due scale restano fuori dal ribaltamento, perché le loro tinte servono da
+ * colore pieno e non da sfondo tenue: `sky-500/600/800` (bottone primario, anello
+ * di focus, stato premuto) e il bianco.
+ */
+.dark {
+  /* Fa scurire anche i controlli nativi: calendari, orologi, barre di scorrimento. */
+  color-scheme: dark;
+
+  --color-superficie: #151f31;
+  --color-fondo: #0b1220;
+  --color-fondo-alto: #0e1a2b;
+
+  --color-slate-50: #0f1829;
+  --color-slate-100: #1b2537;
+  --color-slate-200: #2a3648;
+  --color-slate-300: #3a4a60;
+  --color-slate-400: #7f90a8;
+  --color-slate-500: #93a3b8;
+  --color-slate-600: #b6c2d1;
+  --color-slate-700: #cfd8e3;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
+
+  --color-sky-50: #0c2030;
+  --color-sky-100: #10293c;
+  --color-sky-200: #1c3f57;
+  --color-sky-700: #7dd3fc;
+
+  --color-rose-50: #2a1017;
+  --color-rose-100: #3a1620;
+  --color-rose-200: #52202c;
+  --color-rose-700: #fda4af;
+  --color-rose-800: #fecdd3;
+
+  --color-emerald-50: #0c2119;
+  --color-emerald-100: #123024;
+  --color-emerald-200: #1b4433;
+  --color-emerald-700: #6ee7b7;
+  --color-emerald-800: #a7f3d0;
+
+  --color-amber-50: #2a1e08;
+  --color-amber-100: #3a2a0c;
+  --color-amber-200: #533c12;
+  --color-amber-700: #fcd34d;
+  --color-amber-800: #fde68a;
+  --color-amber-900: #fef3c7;
 }
 
 html {
@@ -16,7 +98,12 @@ html {
 }
 
 body {
-  background: linear-gradient(180deg, #f0f9ff 0%, #f8fafc 340px, #f8fafc 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-fondo-alto) 0%,
+    var(--color-fondo) 340px,
+    var(--color-fondo) 100%
+  );
   min-height: 100dvh;
 }
 

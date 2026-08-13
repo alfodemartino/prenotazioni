@@ -117,7 +117,7 @@ export default async function PaginaSocio({
               Questo socio non ha ancora prenotato.
             </p>
           ) : (
-            <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+            <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie ring-1 ring-slate-200">
               {prenotazioni.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
                   <div className="min-w-0">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NavAdmin from "@/components/admin/NavAdmin";
+import InterruttoreTema from "@/components/InterruttoreTema";
 import { richiediAdmin } from "@/lib/auth";
 import { leggiImpostazioni } from "@/lib/impostazioni";
 import { esci } from "@/app/azioni";
@@ -12,7 +13,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-dvh bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-superficie">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
             <p className="truncate font-semibold text-slate-900">{imp.nomeCircolo}</p>
@@ -22,6 +23,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
+            <InterruttoreTema />
             <Link
               href="/"
               className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-300 transition active:bg-slate-100"

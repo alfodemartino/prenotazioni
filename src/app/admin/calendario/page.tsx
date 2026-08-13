@@ -41,13 +41,13 @@ export default async function PaginaCalendario({
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <Link
           href={`/admin/calendario?da=${addGiorni(da, -GIORNI_MOSTRATI)}`}
-          className="rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
+          className="rounded-xl bg-superficie px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
         >
           ← Precedenti
         </Link>
         <Link
           href={`/admin/calendario?da=${addGiorni(da, GIORNI_MOSTRATI)}`}
-          className="rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
+          className="rounded-xl bg-superficie px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-300"
         >
           Successivi →
         </Link>
@@ -64,7 +64,7 @@ export default async function PaginaCalendario({
         </div>
       </div>
 
-      <ul className="mt-5 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+      <ul className="mt-5 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-superficie shadow-sm ring-1 ring-slate-200">
         {giorni.map((g) => {
           const larghezza = Math.min(100, g.occupazionePct);
 
@@ -115,7 +115,7 @@ export default async function PaginaCalendario({
 
                 <div className="flex shrink-0 items-center gap-2">
                   {g.nellaFinestra && (
-                    <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-800">
+                    <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-700">
                       Prenotabile
                     </span>
                   )}

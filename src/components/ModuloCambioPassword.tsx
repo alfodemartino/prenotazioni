@@ -6,7 +6,7 @@ import RequisitiPassword from "./RequisitiPassword";
 import type { ContestoPassword } from "@/lib/password";
 
 const CAMPO =
-  "w-full rounded-xl border-0 bg-white px-4 py-3 text-base ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500";
+  "w-full rounded-xl border-0 bg-superficie px-4 py-3 text-base ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-500";
 
 const ETICHETTA = "mb-1.5 block text-sm font-medium text-slate-700";
 
@@ -87,7 +87,7 @@ export default function ModuloCambioPassword({
       <button
         type="submit"
         disabled={inCorso}
-        className="w-full rounded-xl bg-sky-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-sky-700 disabled:opacity-60"
+        className="w-full rounded-xl bg-sky-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-sky-800 disabled:opacity-60"
       >
         {inCorso ? "Attendi…" : "Salva la nuova password"}
       </button>

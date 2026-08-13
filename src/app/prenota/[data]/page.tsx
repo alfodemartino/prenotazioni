@@ -113,7 +113,7 @@ export default async function PaginaPrenota({
             )}
           </>
         ) : (
-          <div className="rounded-2xl bg-white p-5 text-center ring-1 ring-slate-200">
+          <div className="rounded-2xl bg-superficie p-5 text-center ring-1 ring-slate-200">
             <p className="text-slate-700">
               {riepilogo.stato === "ESAURITA"
                 ? "Tutti i posti di questa giornata sono già stati prenotati."
