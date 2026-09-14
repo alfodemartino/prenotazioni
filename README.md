@@ -290,5 +290,10 @@ circolo lavora serve il piano Pro. Il passaggio non comporta modifiche al codice
 
 - Email di conferma e promemoria (richiede un servizio di invio e un mittente
   verificato).
-- Ricerca soci lato database: oggi l'elenco viene filtrato in memoria, scelta
-  adeguata a qualche centinaio di tesserati ma da rivedere se cresceranno molto.
+- **Ricerca soci lato database.** Oggi `elencoSoci()` (`src/lib/admin.ts`) legge
+  sempre l'anagrafica intera e la consegna al componente client, che filtra in
+  memoria: la scelta è voluta — è ciò che rende immediato ogni tasto e che ha
+  tolto di mezzo le risposte del server in arrivo fuori tempo — ma significa che
+  aprire «Soci» scarica tutti i tesserati. Su qualche centinaio di profili non si
+  nota; oltre il migliaio il filtro va portato su `WHERE` e impaginato, e la
+  ricerca dal vivo perde per forza l'immediatezza attuale.
