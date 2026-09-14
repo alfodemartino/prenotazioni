@@ -5,6 +5,28 @@ di un circolo riservato ai soci tesserati.
 
 Le regole di funzionamento sono descritte in [SPEC.md](SPEC.md).
 
+## Tecnologie
+
+| Ambito | Scelta | Nota |
+|---|---|---|
+| Applicazione | **Next.js 15** (App Router) e **React 19** | Le scritture passano dalle Server Actions (`src/app/azioni.ts`, `src/app/admin/azioni.ts`): non c'è un'API REST separata da tenere allineata |
+| Linguaggio | **TypeScript 5.8** | `npm run build` fallisce sugli errori di tipo |
+| Database | **PostgreSQL** | Stesso motore in sviluppo e in produzione: il lock che serializza le prenotazioni concorrenti è `SELECT … FOR UPDATE`, e su un motore diverso non si collauderebbe |
+| Accesso ai dati | **Prisma 6** | Migrazioni versionate in `prisma/migrations/`, doppia connessione (pooled per l'app, diretta per la CLI) |
+| Sessione | **jose** | Cookie firmato (JWT) che porta con sé la versione della sessione del socio |
+| Password | **bcryptjs** | Politica e generatore di password in `src/lib/password.ts` |
+| Aspetto | **Tailwind CSS 4** via **PostCSS** | Configurato dal solo `@import "tailwindcss"` in `src/app/globals.css`, senza file di configurazione |
+| Test | **Vitest 3** | Solo logica pura: girano senza database |
+| Script | **tsx** | `prisma/seed.ts` e `prisma/bootstrap.ts` |
+| Pubblicazione | **Vercel** (regione `fra1`) e **Neon** | Lo script `vercel-build` applica le migrazioni prima di compilare |
+| Statistiche | **@vercel/analytics** | Traffico aggregato, nessun dato del socio |
+
+Le validazioni sono scritte a mano in `src/lib/validazioni.ts` e `src/lib/password.ts`,
+come funzioni pure che restituiscono il messaggio d'errore: valgono sul server e sono
+verificate una per una dai test.
+
+Nomi di file, funzioni e commenti sono in italiano, compreso il modello dati.
+
 ## Avvio
 
 Serve un database PostgreSQL. Il modo più rapido per averne uno senza installare
@@ -268,5 +290,10 @@ circolo lavora serve il piano Pro. Il passaggio non comporta modifiche al codice
 
 - Email di conferma e promemoria (richiede un servizio di invio e un mittente
   verificato).
-- Ricerca soci lato database: oggi l'elenco viene filtrato in memoria, scelta
-  adeguata a qualche centinaio di tesserati ma da rivedere se cresceranno molto.
+- **Ricerca soci lato database.** Oggi `elencoSoci()` (`src/lib/admin.ts`) legge
+  sempre l'anagrafica intera e la consegna al componente client, che filtra in
+  memoria: la scelta è voluta — è ciò che rende immediato ogni tasto e che ha
+  tolto di mezzo le risposte del server in arrivo fuori tempo — ma significa che
+  aprire «Soci» scarica tutti i tesserati. Su qualche centinaio di profili non si
+  nota; oltre il migliaio il filtro va portato su `WHERE` e impaginato, e la
+  ricerca dal vivo perde per forza l'immediatezza attuale.
